@@ -4,11 +4,17 @@
   box-sizing: border-box;
 }
 
+:root{
+  --window-width: 100dvw;
+  --window-height: 100dvh;
+  --jeu-dimension: calc(var(--window-height) - 110px);
+}
+
 body{
   padding: 10px 20px;
   background-color: white;
-  width: 100dvw;
-  height: 100dvh;
+  width: var(--window-width);
+  height: var(--window-height);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,7 +24,6 @@ body{
   display: flex;
   flex-direction: column;
   background-color: grey;
-  border: 2px solid black;
   padding: 10px 20px;
   box-shadow: 0 0 5px black;
   width: 100%;
@@ -39,4 +44,19 @@ body{
   background: none;
   border: none;
   font: inherit;
+}
+
+.game-container{
+  height: 100%;
+  border: 2px solid black;
+  border-top: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-container .jeu{
+  width: var(--jeu-dimension);
+  height: var(--jeu-dimension);
+  border: 2px solid black;
 }

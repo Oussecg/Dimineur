@@ -59,4 +59,18 @@ body{
   width: var(--jeu-dimension);
   height: var(--jeu-dimension);
   border: 2px solid black;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+}
+
+.game-button{
+  border: 1px solid black;
+  border-top: none;
+  border-left: none;
+  cursor: grab;
+}
+
+.abnormal-game-button{
+  border-bottom: none;
 }

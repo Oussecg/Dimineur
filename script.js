@@ -3,12 +3,15 @@ class Jeu {
     this.containerClassName = 'jeu';
     this.dimension = 9;
     this.bombNbr = this.randint(7, 10);
-    this.oneSource = 'images/1.png';
-    this.twoSource = 'images/2.png';
-    this.threeSource = 'images/3.png';
-    this.fourSource = 'images/4.png';
-    this.bombSource = 'images/bomb.png';
-    this.redBombSource = 'images/red_bomb.png';
+    this.board = [];
+    this.images = {
+      one: 'images/1.png',
+      two: 'images/2.png',
+      three: 'images/3.png',
+      four: 'images/4.png',
+      bomb: 'images/bomb.png',
+      red_bomb: 'images/red_bomb.png'
+    }
     this.displayButtons();
     this.generateGame();
   }
@@ -19,7 +22,9 @@ class Jeu {
 
   displayButtons() {
     for (let i = 0; i < this.dimension; i++) {
+      this.board[i] = []
       for (let j = 0; j < this.dimension; j++) {
+        this.board[i][j] = '';
         document.querySelector(`.${this.containerClassName}`).innerHTML += `<button class='game-button' data-i=${i} data-j=${j} data-content='' data-state='off' onclick='jeu.buttonClicked(${i}, ${j})'></button>`;
         if (i === this.dimension - 1) {
           document.getElementsByClassName("game-button")[i * this.dimension + j].classList.add("abnormal-game-button");
@@ -33,17 +38,54 @@ class Jeu {
     let b = 0;
     let i = this.randint(0, this.dimension-1);
     let j = this.randint(0, this.dimension-1);
-    while (b < this.bombNbr && this.buttonsList[i * this.dimension + j].dataset.content !== 'bomb') {
+    while (b < this.bombNbr && this.buttonsList[i * this.dimension + j].dataset.content !== 'b') {
       b += 1;
-      this.buttonsList[i * this.dimension + j].dataset.content = "bomb";
+      this.board[i][j] = 'b';
+      this.buttonsList[i * this.dimension + j].dataset.content = "b";
       this.buttonsList[i * this.dimension + j].style.backgroundColor = 'red';
       i = this.randint(0, this.dimension-1);
       j = this.randint(0, this.dimension-1);
     }
   }
 
+  nbrBomb(i, j) {
+    let nbr = 0;
+    for (let k = -1; k < 2; k++) {
+      for (let l = -1; l < 2; l++) {
+        try {
+          if (this.board[i + k][j + l] === "b") {
+            nbr += 1;
+          }
+        } catch (error) {
+          
+        }
+      }
+    }
+    return nbr;
+  }
+
+  placeNumbers(){
+    for (let i = 0; i < this.dimension; i++) {
+      for (let j = 0; j < this.dimension; j++) {
+        const nbr = this.nbrBomb(i, j);
+        if (this.board[i][j] !== "b") {
+          if (nbr === 1) {
+            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.one}' class='buttonImage'>`
+          } else if (nbr === 2) {
+            this.buttonsList[i * this.dimension + j].innerHTML =`<img src='${this.images.two}' class='buttonImage'>`;
+          } else if (nbr === 3) {
+            this.buttonsList[i * this.dimension + j].innerHTML =`<img src='${this.images.three}' class='buttonImage'>`;
+          } else if (nbr === 4){
+            this.buttonsList[i * this.dimension + j].innerHTML =`<img src='${this.images.four}' class='buttonImage'>`;
+          }
+        }
+      }
+    }
+  }
+
   generateGame() {
-    this.placeBomb()
+  this.placeBomb()
+  this.placeNumbers()
   }
 
   buttonClicked(i, j) {
@@ -59,3 +101,5 @@ class Jeu {
 }
 
 let jeu = new Jeu();
+
+

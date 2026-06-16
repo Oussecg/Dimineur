@@ -38,11 +38,13 @@ class Jeu {
     let b = 0;
     let i = this.randint(0, this.dimension-1);
     let j = this.randint(0, this.dimension-1);
-    while (b < this.bombNbr && this.buttonsList[i * this.dimension + j].dataset.content !== 'b') {
-      b += 1;
-      this.board[i][j] = 'b';
-      this.buttonsList[i * this.dimension + j].dataset.content = "b";
-      this.buttonsList[i * this.dimension + j].style.backgroundColor = 'red';
+    while (b < this.bombNbr) {
+      if (this.board[i][j] !== "b") {
+          b += 1;
+          this.board[i][j] = 'b';
+          this.buttonsList[i * this.dimension + j].dataset.content = "b";
+          this.buttonsList[i * this.dimension + j].style.backgroundColor = 'red';
+        }
       i = this.randint(0, this.dimension-1);
       j = this.randint(0, this.dimension-1);
     }
@@ -57,7 +59,7 @@ class Jeu {
             nbr += 1;
           }
         } catch (error) {
-          
+
         }
       }
     }
@@ -72,11 +74,11 @@ class Jeu {
           if (nbr === 1) {
             this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.one}' class='buttonImage'>`
           } else if (nbr === 2) {
-            this.buttonsList[i * this.dimension + j].innerHTML =`<img src='${this.images.two}' class='buttonImage'>`;
+            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.two}' class='buttonImage'>`;
           } else if (nbr === 3) {
-            this.buttonsList[i * this.dimension + j].innerHTML =`<img src='${this.images.three}' class='buttonImage'>`;
+            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.three}' class='buttonImage'>`;
           } else if (nbr === 4){
-            this.buttonsList[i * this.dimension + j].innerHTML =`<img src='${this.images.four}' class='buttonImage'>`;
+            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.four}' class='buttonImage'>`;
           }
         }
       }
@@ -84,8 +86,52 @@ class Jeu {
   }
 
   generateGame() {
-  this.placeBomb()
-  this.placeNumbers()
+    this.placeBomb()
+    this.placeNumbers()
+    this.set_resetButton();
+    this.set_Timer();
+    this.set_nbrBomb();
+  }
+
+  clearButtons() {
+    for (let i = 0; i < this.dimension; i++) {
+      for (let j = 0; j < this.dimension; j++) {
+        this.buttonsList[i * this.dimension + j].dataset.content = '';
+        this.buttonsList[i * this.dimension + j].innerHTML = '';
+        this.buttonsList[i * this.dimension + j].style.backgroundColor = "white";
+      }
+    }
+  }
+
+  set_resetButton() {
+    document.getElementById("resetButton").addEventListener("click", this.resetButton.bind(this));
+  }
+
+  resetButton() {
+    this.clearButtons()
+    this.board = [];
+    clearInterval(this.gameTimer);
+    this.set_Timer();
+    document.getElementById("timeLabel").textContent = `TIME: ${this.timeElapsed}`;
+    this.bombNbr = this.randint(7, 10);
+    document.getElementById("nbrBombLabel").textContent = `BOMB: ${this.bombNbr}`;
+    this.displayButtons();
+    this.placeBomb();
+    this.placeNumbers();
+  }
+
+  set_Timer() {
+    this.timeElapsed = 0;
+    this.gameTimer = setInterval(this.updateTimer.bind(this), 1000);
+  }
+
+  updateTimer() {
+    this.timeElapsed++;
+    document.getElementById("timeLabel").textContent = `TIME: ${this.timeElapsed}`;
+  }
+
+  set_nbrBomb() {
+    document.getElementById("nbrBombLabel").textContent = `BOMB: ${this.bombNbr}`;
   }
 
   buttonClicked(i, j) {

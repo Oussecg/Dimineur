@@ -11,6 +11,7 @@
 }
 
 body{
+  font-family: Arial, Helvetica, sans-serif;
   padding: 10px 20px;
   background-color: white;
   width: var(--window-width);
@@ -56,6 +57,7 @@ body{
 }
 
 .game-container .jeu{
+  position: relative;
   width: var(--jeu-dimension);
   height: var(--jeu-dimension);
   border: 2px solid black;
@@ -65,6 +67,8 @@ body{
 }
 
 .game-button{
+  font-weight: bold;
+  font-size: clamp(12px, 2vw, 24px);
   border: 1px solid black;
   border-top: none;
   border-left: none;
@@ -76,8 +80,44 @@ body{
   border-bottom: none;
 }
 
-.buttonImage{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.x1 {
+    color: blue;
+}
+
+.x2 {
+    color: green;
+}
+
+.x3 {
+    color: red;
+}
+
+.x4 {
+    color: navy;
+}
+
+.x5 {
+    color: brown;
+}
+
+.x6 {
+    color: teal;
+}
+
+.x7 {
+    color: black;
+}
+
+.x8 {
+    color: gray;
+}
+
+#flag-button{
+  position: absolute;
+  border: 1px solid black;
+  width: 30px;
+  height: 30px;
+  top: -10px;
+  left: -10px;
+  cursor: hand;
 }

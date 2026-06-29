@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="main">  
+  <div class="main">
     <div class="data-container">
       <label id="nbrBombLabel">BOMB: 00</label>
       <button id="resetButton">RESET</button>
@@ -18,8 +18,11 @@
     </div>
 
     <div class="game-container">
-      <div class="jeu"></div>
+      <div class="jeu">
+        <button id="flag-button" onclick="jeu.toggleFlag()">🚩</button>
+      </div>
     </div>
+
   </div>
 
   <script src="script.js"></script>

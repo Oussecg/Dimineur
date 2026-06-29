@@ -1,18 +1,13 @@
 class Jeu {
   constructor() {
+    this.gameOver = false;
     this.containerClassName = 'jeu';
     this.dimension = 9;
     this.bombNbr = this.randint(7, 10);
     this.board = [];
-    this.images = {
-      empty: 'images/empty.png',
-      one: 'images/1.png',
-      two: 'images/2.png',
-      three: 'images/3.png',
-      four: 'images/4.png',
-      bomb: 'images/bomb.png',
-      red_bomb: 'images/red_bomb.png'
-    }
+    this.bombPos = [];
+    this.flagPos = [];
+    this.flagSet = false;
     this.displayButtons();
     this.generateGame();
   }
@@ -26,7 +21,7 @@ class Jeu {
       this.board[i] = []
       for (let j = 0; j < this.dimension; j++) {
         this.board[i][j] = '';
-        document.querySelector(`.${this.containerClassName}`).innerHTML += `<button class='game-button' data-i=${i} data-j=${j} data-content='' data-state='on' data-hiddenSource='' onclick='jeu.buttonClicked(${i}, ${j})'></button>`;
+        document.querySelector(`.${this.containerClassName}`).innerHTML += `<button class='game-button' data-i=${i} data-j=${j} data-state='on' data-hiddenSource='' onclick='jeu.buttonClicked(${i}, ${j})'></button>`;
         if (i === this.dimension - 1) {
           document.getElementsByClassName("game-button")[i * this.dimension + j].classList.add("abnormal-game-button");
         }
@@ -43,8 +38,14 @@ class Jeu {
       if (this.board[i][j] !== "b") {
           b += 1;
           this.board[i][j] = 'b';
-          this.buttonsList[i * this.dimension + j].dataset.content = "b";
-          this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.bomb}' class='buttonImage'>`;
+          this.bombPos.push(
+            {
+              x: i,
+              y: j
+            }
+          )
+          this.buttonsList[i * this.dimension + j].dataset.hiddenSource = "b";
+          this.buttonsList[i * this.dimension + j].innerText = '💣';
         }
       i = this.randint(0, this.dimension-1);
       j = this.randint(0, this.dimension-1);
@@ -71,24 +72,10 @@ class Jeu {
     for (let i = 0; i < this.dimension; i++) {
       for (let j = 0; j < this.dimension; j++) {
         const nbr = this.nbrBomb(i, j);
-        if (this.board[i][j] !== "b") {
-          if (nbr === 1) {
-            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.one}' class='buttonImage'>`
-            this.buttonsList[i * this.dimension + j].dataset.hiddenSource = this.images.one;
-            this.board[i][j] = "1";
-          } else if (nbr === 2) {
-            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.two}' class='buttonImage'>`;
-            this.buttonsList[i * this.dimension + j].dataset.hiddenSource = this.images.two;
-            this.board[i][j] = "2";
-          } else if (nbr === 3) {
-            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.three}' class='buttonImage'>`;
-            this.buttonsList[i * this.dimension + j].dataset.hiddenSource = this.images.three;
-            this.board[i][j] = "3";
-          } else if (nbr === 4){
-            this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.four}' class='buttonImage'>`;
-            this.buttonsList[i * this.dimension + j].dataset.hiddenSource = this.images.four;
-            this.board[i][j] = "4";
-          }
+        if (this.board[i][j] !== "b" && nbr !== 0) {
+          this.buttonsList[i * this.dimension + j].dataset.hiddenSource = `${nbr}`;
+          this.buttonsList[i * this.dimension + j].innerText = nbr;
+          this.buttonsList[i * this.dimension + j].classList.add(`x${nbr}`);
         }
       }
     }
@@ -97,11 +84,8 @@ class Jeu {
   coverButtons() {
     for (let i = 0; i < this.dimension; i++) {
       for (let j = 0; j < this.dimension; j++) {
-        if (!this.buttonsList[i * this.dimension + j].querySelector("img")) {
-          this.buttonsList[i * this.dimension + j].innerHTML = `<img src='${this.images.empty}' class='buttonImage'>`;
-        } else {
-          this.buttonsList[i * this.dimension + j].querySelector("img").src = this.images.empty;
-        }
+        this.buttonsList[i * this.dimension + j].innerText = '';
+        this.buttonsList[i * this.dimension + j].style.backgroundColor = 'lightgrey';
       }
     }
   }
@@ -119,7 +103,8 @@ class Jeu {
     for (let i = 0; i < this.dimension; i++) {
       for (let j = 0; j < this.dimension; j++) {
         this.buttonsList[i * this.dimension + j].dataset.content = '';
-        this.buttonsList[i * this.dimension + j].innerHTML = '';
+        this.buttonsList[i * this.dimension + j].dataset.hiddenSource = '';
+        this.buttonsList[i * this.dimension + j].innerText = '';
         this.buttonsList[i * this.dimension + j].style.backgroundColor = "white";
       }
     }
@@ -156,33 +141,44 @@ class Jeu {
     document.getElementById("nbrBombLabel").textContent = `BOMB: ${this.bombNbr}`;
   }
 
+  toggleFlag() {
+    if (this.flagSet) {
+      this.flagSet = false;
+      document.querySelectorAll(".game-button").forEach((button) => {
+        button.style.cursor = "grab";
+      });
+    } else {
+      this.flagSet = true;
+      document.querySelectorAll(".game-button").forEach(button => {
+        button.style.cursor = "url('images/flag-cursor.png'), auto";
+      });
+    }
+  }
+
   buttonClicked(i, j) {
-    const button = this.buttonsList[(i * this.dimension) + j];
-
-
-    if (button.dataset.state === 'on') {
-      button.dataset.state = 'off';
-      alert(`Button(${i},${j}) has been clicked !`)
-      button.innerHTML = "";
-      button.style.backgroundColor = "cyan";
-
-      console.log(this.board);
-      let i1 = i + 1;
-      while (i1 > 0) {
-        i1--;
-        let j1 = j - 1;
-        let test = true;
-        while (j1 < this.dimension && test) {
-          j1++;
-          console.log(i1, j1)
-          if (i !== i1 || j !== j1) {
-            if (this.board[i1][j1] === "") {
-              this.buttonsList[i1 * this.dimension + j1].innerHTML = "";
-              this.buttonsList[i1 * this.dimension + j1].style.backgroundColor = "red";
-            } else {
-              test = false;
-            }
-          }
+    if (! this.gameOver) {
+      const button = this.buttonsList[(i * this.dimension) + j];
+      if (this.flagSet) {
+        if (button.innerText === "🚩") {
+          button.innerText = "";
+          this.flagPos = this.flagPos.filter(
+            (flag) => !(flag.x === i && flag.y === j),
+          );
+        } else {
+          button.innerText = "🚩";
+          this.flagPos.push({
+            x: i,
+            y: j
+          })
+        }
+      } else {
+        if (this.board[i][j] === 'b') {
+          this.gameOver = true;
+          this.bombPos.forEach(bomb => {
+            this.buttonsList[bomb.x * this.dimension + bomb.y].innerText = "💣";
+            this.buttonsList[bomb.x * this.dimension + bomb.y].style.backgroundColor = 'red';
+          });
+        } else {
 
         }
       }
